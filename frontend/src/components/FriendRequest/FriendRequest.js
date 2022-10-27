@@ -36,6 +36,11 @@ const FriendRequest = () => {
                 label: 'Aceptar solicitud',
                 field: 'aceptar',
                 width: 200,
+            },
+            {
+                label: 'Rechazar solicitud',
+                field: 'rechazar',
+                width: 200,
             }
         ]
 
@@ -54,6 +59,9 @@ const FriendRequest = () => {
                         return {
                             ...e, aceptar: <Button variant="success" onClick={() => { aceptar(e) }}>
                                 Aceptar
+                            </Button>,
+                            rechazar: <Button variant="danger" onClick={() => { rechazar(e) }}>
+                                Rechazar
                             </Button>
                         }
                     } else {
@@ -111,6 +119,33 @@ const FriendRequest = () => {
 
 
 
+    const rechazar = (datatable) => {
+        let myHeaders = new Headers()
+        myHeaders.append("Content-Type", "application/json")
+
+        let a = JSON.stringify(datatable)
+
+        let requesOptions = {
+            method: 'PUT',
+            headers: myHeaders,
+            body: a,
+            redirect: 'follow'
+        }
+
+        fetch("http://localhost:9000/rechazar_solicitud", requesOptions)
+            .then(response => response.text())
+            .then(result => {
+                console.log(result)
+
+                swal({
+                    title:"Rechazado",
+                    text: "Se ha rechazado la solicitud",
+                    icon: "warning",
+                    timer: 1000,
+                });
+            })
+            .catch(error => console.log('error', error))
+    }
 
 
 

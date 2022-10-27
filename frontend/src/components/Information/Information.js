@@ -1,4 +1,9 @@
+import React, { useState } from 'react'
+
+import swal from 'sweetalert';
+
 import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
+
 
 import Barra from "../Barra/Barra";
 import foto from './fotoPerfil.jpg'
@@ -7,6 +12,45 @@ import foto from './fotoPerfil.jpg'
 
 
 function Information ()  {
+    const [datosNuevos, seDatos] = useState({
+        Nombre: "",      
+        Usuario: "",  
+        Boot: "",   
+        Pass: "",    
+        Confpass: ""  
+    });
+
+    const CambiarDatos = async () => {
+        let myHeaders = new Headers()
+        myHeaders.append("Content-Type", "application/json")
+
+        //let a = JSON.stringify(datosNuevos)
+        //console.log(a)
+        console.log(datosNuevos)
+        
+        let requesOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: datosNuevos,
+            redirect: 'follow'
+        }
+
+        fetch("http://localhost:9000/actualizar_datos", requesOptions)
+            .then(response => response.text())
+            .then(result => {
+                console.log(result)
+
+                swal({
+                    title:"Correcto",
+                    text: "Sus datos han sido actualizados",
+                    icon: "success",
+                    timer: 2000,
+                });
+            })
+            .catch(error => console.log('error', error))
+
+    };
+
 
 
 
@@ -104,6 +148,7 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Nombre" color="primary"
                         id="Nombre" name="Nombre"
+                        onChange={(e) => {datosNuevos.Nombre=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
@@ -114,6 +159,7 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Usuario" color="primary"
                         id="Usuario" name="Usuario"
+                        onChange={(e) => {datosNuevos.Usuario=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
@@ -123,34 +169,37 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Modo boot" color="primary"
                         id="Boot" name="Boot"
+                        onChange={(e) => {datosNuevos.Boot=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
 
                 <Row>
                     <Input
+                        bordered
                         id="filled-adornment-password"
                         type='password'
-                        bordered
-                        color="primary" placeholder=" Contraseña"
+                        color="primary" labelPlaceholder="Contraseña"
+                        onChange={(e) => {datosNuevos.Pass=e.target.value}}
                     />
                 </Row>
-                <br></br>
+                <br></br><br></br>
 
 
                 <Row>
                     <Input
-                        id="filled-adornment-password"
-                        type='password'
                         bordered
-                        color="primary" placeholder="Confirmar contraseña"
+                        id="filled-adornment-password2"
+                        type='password'
+                        color="primary" labelPlaceholder="Confirmar contraseña"
+                        onChange={(e) => {datosNuevos.Confpass=e.target.value}}
                     />
                 </Row>    
                 <br></br>
 
 
                 <Row>
-                    <Button auto ghost color="primary" onClick="">
+                    <Button auto ghost color="primary" onClick={() => CambiarDatos()} >
                         Modificar datos
                     </Button>
                 </Row>            

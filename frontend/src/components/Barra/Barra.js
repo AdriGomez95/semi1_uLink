@@ -1,8 +1,17 @@
-import { Navbar, Dropdown, Text } from "@nextui-org/react";
+import { Navbar, Dropdown, Text, Button} from "@nextui-org/react";
 import { Layout } from "./Layout.js";
 
 
 export default function Barra() {
+
+  const MisPublicaciones = () => {
+    window.location="http://localhost:3000/publicaciones"
+  };
+
+  const AmigosPublicaciones = () => {
+    window.location="http://localhost:3000/publicaciones"
+  };
+
 
   return (
     <Layout>
@@ -75,14 +84,18 @@ export default function Barra() {
               showFullDescription
               description="Hacer una publicacion"
             >
-              Mis publicaciones
+            <Button color="gradient" rounded bordered auto ghost onClick={MisPublicaciones}>
+                Mis publicaciones
+            </Button>
             </Dropdown.Item>
             <Dropdown.Item
               key="amigospublicaciones"
               showFullDescription
               description="Ver las publicaciones de mis amigos"
             >
+            <Button color="gradient" rounded bordered auto ghost onClick={AmigosPublicaciones}>
               Publicaciones amigos
+            </Button>
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
