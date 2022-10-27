@@ -5,7 +5,8 @@ import Login from "./components/Login/login";
 import Information from './components/Information/Information'
 import AddFriend from './components/AddFriend/AddFriend'
 import FriendRequest from './components/FriendRequest/FriendRequest'
-
+import Registrar from "./components/Registrar/register";
+import Confirmar from "./components/Registrar/confirmarcorreo";
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
         <Route path="/" element={<Login />} exact />    
         <Route path="/informacion" element={<Information />} exact />    
         <Route path="/agregar_amigos" element={<AddFriend />} exact />   
-        <Route path="/solicitudes" element={<FriendRequest />} exact />    
+        <Route path="/solicitudes" element={<FriendRequest />} exact /> 
+        <Route path="/registrar" element={<div> <Registrar/></div> } exact />   
+        <Route path="/confirmarcorreo/:id" element={<div> <Confirmar/></div> } exact />   
       </Routes>
     </BrowserRouter>
     </div>
