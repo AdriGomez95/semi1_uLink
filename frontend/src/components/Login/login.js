@@ -2,8 +2,9 @@ import "./estilo.css";
 import { Link ,useNavigate  } from "react-router-dom";
 import { useState } from "react";
 import swal from 'sweetalert';
+import { Auth } from "aws-amplify";
 
-import { methodPOST, login } from "../../services/api";
+
 function Login() {
   let navigate = useNavigate();
   const [logearte, setLogin] = useState({
@@ -11,17 +12,21 @@ function Login() {
     password: "",
   });
   const log = async () => {
-    const respuesta = await methodPOST(login, logearte);
-    if (respuesta.length > 0) {
-      swal({
-        title:"Welcome",
-        text: "You are logged in",
-        icon: "success",
-        timer: 1000,
-      });
-      navigate("/dashboard", { state: respuesta });
-    }else{
-      swal("Credentials wrong", "wrong username or password!", "error");
+    // console.log(registrarte);
+    if (
+      logearte.username != "" &&
+      logearte.password != ""
+    ) {
+      try {
+        await Auth.signIn( logearte.username, logearte.password)
+        swal("Exito","Login Exitoso", "success");
+        navigate("/informacion");
+      } catch (error) {
+        console.error(error);
+        swal("Error", error.message, "error");
+      }
+    } else {
+      swal("Incomplete data", "Please fill in all the fields!", "error");
     }
   };
 
