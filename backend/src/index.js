@@ -12,7 +12,7 @@ app.use(express.json())
 
 //Database Connection
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://ec2-3-84-236-43.compute-1.amazonaws.com/?tls=false";
+var url = "mongodb://ec2-35-174-172-210.compute-1.amazonaws.com/?tls=false";
 
 //routes
 app.get('/', (req, res)=>{
