@@ -9,6 +9,29 @@ import Registrar from "./components/Registrar/register";
 import Confirmar from "./components/Registrar/confirmarcorreo";
 import Posts from './components/Posts/Posts'
 import Messages from "./components/Messages/Messages"
+import Amplify from "aws-amplify";
+import AWS from 'aws-sdk';
+// const S3_BUCKET ='YOUR_BUCKET_NAME_HERE';
+// const REGION ='YOUR_DESIRED_REGION_HERE';
+
+
+AWS.config.update({
+    accessKeyId: 'AKIAS73YTZZYZGXS56UN',
+    secretAccessKey: 'RFSBvcymuM3DiQKWVwdOJ4WJQfIdHmXYLR8nG+0x'
+})
+
+// const myBucket = new AWS.S3({
+//     params: { Bucket: S3_BUCKET},
+//     region: REGION,
+// })
+
+Amplify.configure({
+  aws_project_region: 'us-east-1',
+  region: 'us-east-1',
+  identityPoolRegion: 'us-east-1',
+  userPoolId: 'us-east-1_HjfRMnfJq',
+  userPoolWebClientId: '5p35dsn9vvefr9k8r4fc0qhr09',
+});
 
 function App() {
   return (

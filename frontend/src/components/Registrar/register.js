@@ -2,18 +2,12 @@ import "./estilo.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import swal from "sweetalert";
-import Amplify from "aws-amplify";
+
 import { Auth } from "aws-amplify";
 import { methodPOST, registrar } from "../../services/api";
 
 
-Amplify.configure({
-  aws_project_region: 'us-east-1',
-  region: 'us-east-1',
-  identityPoolRegion: 'us-east-1',
-  userPoolId: 'us-east-1_HjfRMnfJq',
-  userPoolWebClientId: '5p35dsn9vvefr9k8r4fc0qhr09',
-});
+
 
 
 function Registrar() {
