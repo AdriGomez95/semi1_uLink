@@ -25,6 +25,9 @@ function Registrar() {
     name: "",
     confirmPassword: "",
   });
+
+
+  
   const log = async () => {
     // console.log(registrarte);
     if (
@@ -35,7 +38,7 @@ function Registrar() {
     ) {
       try {
         if (registrarte.password === registrarte.confirmPassword) {
-        await Auth.signUp({
+      const register=  await Auth.signUp({
           username: registrarte.email,
           password: registrarte.password,
           attributes: {
@@ -44,6 +47,7 @@ function Registrar() {
             'custom:susname': registrarte.username,
           },
         });
+        console.log(register)
         swal("Exito","Registrado Con exito!", "success");
         navigate("/");
       }else{
@@ -57,6 +61,10 @@ function Registrar() {
       swal("Incomplete data", "Please fill in all the fields!", "error");
     }
   };
+
+
+
+
   return (
     <div className="Auth-form-container" style={{ background: "gray" }}>
       <div className="Auth-form">
