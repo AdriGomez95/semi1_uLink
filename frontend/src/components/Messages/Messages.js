@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { MDBDataTableV5 } from 'mdbreact'
-import io from "socket.io-client";
+//import io from "socket.io-client";
 import swal from 'sweetalert';
 import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
 
@@ -9,8 +9,8 @@ import Barra from "../Barra/Barra"
 
 
 
-const ENDPOINT = "http://localhost:9000/";
-const socket = io(ENDPOINT, {transports:['websocket']});
+//const ENDPOINT = "http://localhost:9000/";
+//const socket = io(ENDPOINT, {transports:['websocket']});
 
 
 
@@ -96,18 +96,14 @@ function Messages ()  {
 
 
 
-
-    //let socket = io('/localhost:9000/connection')
-    
-    //const ENDPOINT = "http://localhost:9000/connection";
-    //const socket = io(ENDPOINT, {transports:['websocket']});
+/*
     const mandar = () => {
         console.log('entro')
         socket.emit("probando", 'mensaje desde el cliente')
 
     }
 
-
+*/
 
 
 
@@ -154,7 +150,7 @@ function Messages ()  {
 
             <Grid>
                 <Row>
-                    <Button auto ghost color="gradient" onPress={() => mandar()} >
+                    <Button auto ghost color="gradient" onPress={() => enviarDatos()} >
                         Enviar mensaje
                     </Button>
                 </Row>            

@@ -7,6 +7,7 @@ import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
 import AWS from 'aws-sdk';
 import Barra from "../Barra/Barra";
 import foto from './fotoPerfil.jpg'
+import { useLocation } from 'react-router-dom';
 
 AWS.config.apiVersions = {
     translate: '2017-07-01',
@@ -26,10 +27,15 @@ var params = {
     Text: 'Hello! My name is Fernando.'
   };
 function Information ()  {
-    const [datosNuevos, seDatos] = useState({
-        Nombre: "",      
-        Usuario: "",  
-        Boot: "",   
+    const user = JSON.parse(localStorage.getItem('usuario'));
+    console.log(user)
+    const [datosNuevos, setDatosNuevos] = useState({
+        name: "",      
+        lastname: "",  
+        username: "", 
+        imgurl: "",  
+        bot: "",  
+        actualusername: "",   
         Pass: "",    
         Confpass: ""  
     });
@@ -169,7 +175,18 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Nombre" color="primary"
                         id="Nombre" name="Nombre"
-                        onChange={(e) => {datosNuevos.Nombre=e.target.value}}
+                        onChange={(e) => {datosNuevos.name=e.target.value}}
+                    />
+                </Row>
+                <br></br><br></br>
+
+
+                <Row>
+                    <Input
+                        bordered
+                        labelPlaceholder="Apellido" color="primary"
+                        id="Apellido" name="Apellido"
+                        onChange={(e) => {datosNuevos.lastname=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
@@ -180,7 +197,29 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Usuario" color="primary"
                         id="Usuario" name="Usuario"
-                        onChange={(e) => {datosNuevos.Usuario=e.target.value}}
+                        onChange={(e) => {datosNuevos.username=e.target.value}}
+                    />
+                </Row>
+                <br></br><br></br>
+
+
+                <Row>
+                    <Input
+                        bordered
+                        labelPlaceholder="Imagen" color="primary"
+                        id="Imagen" name="Imagen"
+                        onChange={(e) => {datosNuevos.imgurl=e.target.value}}
+                    />
+                </Row>
+                <br></br><br></br>
+
+
+                <Row>
+                    <Input
+                        bordered
+                        labelPlaceholder="Usuario actual" color="primary"
+                        id="UsuarioActual" name="Usuario actual"
+                        onChange={(e) => {datosNuevos.actualusername=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
@@ -190,7 +229,7 @@ function Information ()  {
                         bordered
                         labelPlaceholder="Modo boot" color="primary"
                         id="Boot" name="Boot"
-                        onChange={(e) => {datosNuevos.Boot=e.target.value}}
+                        onChange={(e) => {datosNuevos.bot=e.target.value}}
                     />
                 </Row>
                 <br></br><br></br>
@@ -206,17 +245,6 @@ function Information ()  {
                 </Row>
                 <br></br><br></br>
 
-
-                <Row>
-                    <Input
-                        bordered
-                        id="filled-adornment-password2"
-                        type='password'
-                        color="primary" labelPlaceholder="Confirmar contraseña"
-                        onChange={(e) => {datosNuevos.Confpass=e.target.value}}
-                    />
-                </Row>    
-                <br></br>
 
 
                 <Row>

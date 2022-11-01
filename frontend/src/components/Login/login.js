@@ -18,9 +18,12 @@ function Login() {
       logearte.password != ""
     ) {
       try {
-        await Auth.signIn( logearte.username, logearte.password)
+        const datosUsuario = await Auth.signIn( logearte.username, logearte.password)
+        
+        localStorage.setItem('usuario', JSON.stringify(datosUsuario));
         swal("Exito","Login Exitoso", "success");
         navigate("/informacion");
+
       } catch (error) {
         console.error(error);
         swal("Error", error.message, "error");
