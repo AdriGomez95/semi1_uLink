@@ -1,16 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import swal from 'sweetalert';
 
 import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
 
-
+import AWS from 'aws-sdk';
 import Barra from "../Barra/Barra";
 import foto from './fotoPerfil.jpg'
 
+AWS.config.apiVersions = {
+    translate: '2017-07-01',
+  }
+
+  var translate = new AWS.Translate();
+AWS.config.update({
+    accessKeyId: 'AKIAS73YTZZYZGXS56UN',
+    secretAccessKey: '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',
+    region: 'us-east-1',
+})
 
 
-
+var params = {
+    SourceLanguageCode: 'auto',
+    TargetLanguageCode: 'es',
+    Text: 'Hello! My name is Fernando.'
+  };
 function Information ()  {
     const [datosNuevos, seDatos] = useState({
         Nombre: "",      
@@ -26,35 +40,42 @@ function Information ()  {
 
         //let a = JSON.stringify(datosNuevos)
         //console.log(a)
-        console.log(datosNuevos)
-        
-        let requesOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: datosNuevos,
-            redirect: 'follow'
-        }
+        // console.log(datosNuevos)
+        translate.translateText(params, function (err, data) {
+            if (err) console.log(err, err.stack); 
+            else     console.log(data['TranslatedText']);
+          });
 
-        fetch("http://localhost:9000/actualizar_datos", requesOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result)
+        // let requesOptions = {
+        //     method: 'POST',
+        //     headers: myHeaders,
+        //     body: datosNuevos,
+        //     redirect: 'follow'
+        // }
 
-                swal({
-                    title:"Correcto",
-                    text: "Sus datos han sido actualizados",
-                    icon: "success",
-                    timer: 2000,
-                });
-            })
-            .catch(error => console.log('error', error))
+        // fetch("http://localhost:9000/actualizar_datos", requesOptions)
+        //     .then(response => response.text())
+        //     .then(result => {
+        //         console.log(result)
+
+        //         swal({
+        //             title:"Correcto",
+        //             text: "Sus datos han sido actualizados",
+        //             icon: "success",
+        //             timer: 2000,
+        //         });
+        //     })
+        //     .catch(error => console.log('error', error))
 
     };
 
 
 
+  
 
-
+      useEffect(() => {
+        CambiarDatos()
+        }, [])
     return (
       <div>
         <Barra/>
