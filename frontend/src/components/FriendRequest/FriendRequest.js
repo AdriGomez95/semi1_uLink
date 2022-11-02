@@ -4,32 +4,35 @@ import { Button } from 'react-bootstrap'
 import swal from 'sweetalert'
 
 import Barra from "../Barra/Barra"
+import {methodPUT, aceptarSolicitud} from "../../services/api";
+
 
 
 const FriendRequest = () => {
     let [datatable, setDatatable] = useState({})
 
 
+    const username = JSON.parse(localStorage.getItem('usuario'));
 
     useEffect(() => {
         const columns = [
             {
-                label: 'Nombre',
-                field: 'nombre',
+                label: 'Usuario',
+                field: 'user',
                 width: 150,
                 attributes: {
                     'aria-controls': 'DataTable',
-                    'aria-label': 'Nombre',
+                    'aria-label': 'Usuario',
                 },
             },
             {
-                label: 'Usuario',
-                field: 'usuario',
+                label: 'Estado',
+                field: 'state',
                 width: 200,
             },
             {
                 label: 'Modo boot',
-                field: 'boot',
+                field: 'bot',
                 width: 200,
             },
             {
@@ -51,18 +54,41 @@ const FriendRequest = () => {
             redirect: 'follow'
         }
 
-        fetch("http://localhost:9000/listado_usuarios", requestOptions)
+        fetch(`http://localhost:8080/requests/`+ username, requestOptions)
             .then(response => response.json())
             .then(result => {
                 let filas = result.map((e) => {
                     if (e.estado !== '') {
-                        return {
-                            ...e, aceptar: <Button variant="success" onClick={() => { aceptar(e) }}>
-                                Aceptar
-                            </Button>,
-                            rechazar: <Button variant="danger" onClick={() => { rechazar(e) }}>
-                                Rechazar
-                            </Button>
+                        if(e.state === 'acepted'){
+                            return {
+                                ...e, 
+                                aceptar: <Button disabled="true" variant="success" onClick={() => { aceptar(e) }}>
+                                    Aceptar
+                                </Button>,
+                                rechazar: <Button variant="warning" onClick={() => { rechazar(e) }}>
+                                    Eliminar
+                                </Button>
+                            }
+                        }else if(e.state === 'denied'){                            
+                            return {
+                                ...e, 
+                                aceptar: <Button disabled="true"  variant="success" onClick={() => { aceptar(e) }}>
+                                    Aceptar
+                                </Button>,
+                                rechazar: <Button disabled="true" variant="danger" onClick={() => { rechazar(e) }}>
+                                    Rechazar
+                                </Button>
+                            }
+                        }else if(e.state === 'pending'){                            
+                            return {
+                                ...e, 
+                                aceptar: <Button variant="success" onClick={() => { aceptar(e) }}>
+                                    Aceptar
+                                </Button>,
+                                rechazar: <Button variant="danger" onClick={() => { rechazar(e) }}>
+                                    Rechazar
+                                </Button>
+                            }
                         }
                     } else {
                         return false
@@ -77,74 +103,51 @@ const FriendRequest = () => {
     }, [])
 
 
-    const aceptar = (datatable) => {
-        let myHeaders = new Headers()
-        myHeaders.append("Content-Type", "application/json")
+    const aceptar = async (datatable) => {
+        
+        const acepta = await methodPUT(aceptarSolicitud, {"user":datatable.user, "friend":username.attributes['custom:susname'], "answer":"acepted"})
 
-        let a = JSON.stringify(datatable)
 
-        let requesOptions = {
-            method: 'PUT',
-            headers: myHeaders,
-            body: a,
-            redirect: 'follow'
+        if(acepta){
+            swal({
+                title:"Aceptado",
+                text: "Se ha aceptado la solicitud",
+                icon: "success",
+                timer: 1000,
+            });
+        }else{
+            swal({
+                title:"Error",
+                text: "No se envio la solicitud",
+                icon: "Error",
+                timer: 1000,
+            });
         }
-
-        fetch("http://localhost:9000/aceptar_solicitud", requesOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result)
-
-                swal({
-                    title:"Aceptado",
-                    text: "Se ha aceptado la solicitud",
-                    icon: "success",
-                    timer: 1000,
-                });
-                /*
-                if (result.status === 200) {
-                    swal({
-                        title:"Enviado",
-                        text: "Se ha enviado la solicitud",
-                        icon: "success",
-                        timer: 1000,
-                    });
-                }*/
-            })
-            .catch(error => console.log('error', error))
-
-
     }
 
 
 
 
-    const rechazar = (datatable) => {
-        let myHeaders = new Headers()
-        myHeaders.append("Content-Type", "application/json")
+    const rechazar = async (datatable) => {
+        
+        const rechaza = await methodPUT(aceptarSolicitud, {"user":datatable.user, "friend":"adrigomez", "answer":"denied"})
 
-        let a = JSON.stringify(datatable)
 
-        let requesOptions = {
-            method: 'PUT',
-            headers: myHeaders,
-            body: a,
-            redirect: 'follow'
+        if(rechaza){
+            swal({
+                title:"Aceptado",
+                text: "Se ha rechazado la solicitud",
+                icon: "success",
+                timer: 1000,
+            });
+        }else{
+            swal({
+                title:"Error",
+                text: "No se rechazo la solicitud",
+                icon: "Error",
+                timer: 1000,
+            });
         }
-
-        fetch("http://localhost:9000/rechazar_solicitud", requesOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result)
-
-                swal({
-                    title:"Rechazado",
-                    text: "Se ha rechazado la solicitud",
-                    icon: "warning",
-                    timer: 1000,
-                });
-            })
-            .catch(error => console.log('error', error))
     }
 
 

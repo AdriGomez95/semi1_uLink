@@ -39,7 +39,7 @@ export default function Barra() {
           <Navbar.Link href="/agregar_amigos">Amigos</Navbar.Link>
           <Navbar.Link href="/solicitudes">Solicitudes</Navbar.Link>
           <Navbar.Link isActive href="/informacion">Informacion</Navbar.Link>
-          <Navbar.Link href="/">Chat</Navbar.Link>
+          <Navbar.Link href="/mensajes">Chat</Navbar.Link>
 
 
 

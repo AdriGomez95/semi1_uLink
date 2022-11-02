@@ -16,10 +16,10 @@ import AWS from 'aws-sdk';
 
 
 AWS.config.update({
-    accessKeyId: 'AKIAS73YTZZYZGXS56UN',
-    secretAccessKey: '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'
+  accessKeyId: 'AKIAS73YTZZYZGXS56UN',
+  secretAccessKey: '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',
+  region: 'us-east-1',
 })
-
 // const myBucket = new AWS.S3({
 //     params: { Bucket: S3_BUCKET},
 //     region: REGION,

@@ -1,9 +1,46 @@
 const express = require('express');
 const app = express();
-const morgan = require('morgan');
+var bodyParser = require('body-parser');  //............. NUEVO
+const morgan = require('morgan'); 
+const cors = require('cors'); //............. NUEVO
+app.use(cors());  //............. NUEVO
 
-const cors = require('cors');
-app.use(cors());
+
+//------------------------------------------------------------------------------------ NUEVO
+app.use(bodyParser.json());
+
+app.use(cors({ origin: true, optionsSuccessStatus: 200 }));
+app.use(bodyParser.json({ limit: "50mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+//------------------------------------------------------------------------------------ FIN
+
+
+
+//starting server
+const pd = app.listen(app.get('port'), ()=>{
+  console.debug(`Server on port ${app.get('port')}`)
+})
+
+
+//------------------------------------------------------------------------------------ NUEVO
+const io = require("socket.io")(pd, 
+  {  
+      cors: {    origin: "http://localhost:3000",  }
+  });
+
+
+io.on("connection", (socket) => {
+  console.log('entro desde el front')
+  
+  socket.on("probando", (data)=>{
+    console.log("estamos conectados")
+    console.log(data)
+  });
+      
+});
+//------------------------------------------------------------------------------------ FIN
+
+
 
 
 //settings
@@ -25,7 +62,6 @@ app.get('/', (req, res)=>{
 
 app.post('/signup', (req, res)=>{
     const { name, lastname, username, email, password, imgurl} = req.body;
-    
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("uLink");
@@ -49,7 +85,6 @@ app.post('/login', (req, res)=>{
         var query = { username: username, password:password };
         dbo.collection("users").find(query).toArray(function(err, result) {
           if (err) throw err;
-          console.log(result);
           db.close();
           if(result.length == 1){
             res.json(result[0])
@@ -61,7 +96,7 @@ app.post('/login', (req, res)=>{
 })
 
 
-app.get('/userinfo', (req, res)=>{
+app.post('/userinfo', (req, res)=>{
   const {username} = req.body;
   
   MongoClient.connect(url, function(err, db) {
@@ -84,7 +119,7 @@ app.get('/userinfo', (req, res)=>{
 
 app.put('/update', (req, res)=>{
   const {name, lastname, username, imgurl, bot, actualusername} = req.body;
-  
+
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db("uLink");
@@ -98,9 +133,9 @@ app.put('/update', (req, res)=>{
     });
   });
 })
-
-app.get('/users', (req, res)=>{
-  const {username} = req.body;
+ 
+app.get('/users/:usuario', (req, res)=>{
+  const username = req.params.usuario;
   
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
@@ -108,7 +143,7 @@ app.get('/users', (req, res)=>{
     dbo.collection("users").find({friends: {$nin: [username]}}).toArray(function(err, result) {
       if (err) throw err;
       console.log(result);
-      db.close();
+      db.close(); 
       res.json(result)
     });
   });
@@ -222,7 +257,19 @@ app.get('/readPosts', (req, res)=>{
 })
 
 
-//starting server
-app.listen(app.get('port'), ()=>{
-    console.log(`Server on port ${app.get('port')}`)
+app.get('/requests/:usuario', (req, res)=>{
+  const username = req.params.usuario; 
+  
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("uLink");
+    var query = { friend: username};
+    dbo.collection("requests").find(query).toArray(function(err, result) {
+      if (err) throw err;
+      //console.log(result);
+      db.close();  
+      res.json(result)
+    });
+  });
 })
+

@@ -2,22 +2,27 @@ import React, { useState, useEffect } from 'react'
 import { MDBDataTableV5 } from 'mdbreact'
 //import io from "socket.io-client";
 import swal from 'sweetalert';
-import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
+import { Grid, Text, Row, Input, Button } from "@nextui-org/react";
 
 import Barra from "../Barra/Barra"
+import {methodPOST,enviarMensaje} from "../../services/api";
 
 
 
-
-//const ENDPOINT = "http://localhost:9000/";
-//const socket = io(ENDPOINT, {transports:['websocket']});
-
+/*
+const ENDPOINT = "http://localhost:9000/";
+const socket = io(ENDPOINT, {transports:['websocket']});
+*/
 
 
 
 
 function Messages ()  {
     
+    const user = JSON.parse(localStorage.getItem('usuario'));
+
+
+
     let [datatable, setDatatable] = useState({})
 
 
@@ -25,7 +30,7 @@ function Messages ()  {
         const columns = [
             {
                 label: 'Usuario',
-                field: 'usuario',
+                field: 'username',
                 width: 150,
                 attributes: {
                     'aria-controls': 'DataTable',
@@ -34,12 +39,7 @@ function Messages ()  {
             },
             {
                 label: 'Mensaje',
-                field: 'mensaje',
-                width: 200,
-            },
-            {
-                label: 'Fecha',
-                field: 'fecha',
+                field: 'message',
                 width: 200,
             }
         ]
@@ -51,7 +51,7 @@ function Messages ()  {
             redirect: 'follow'
         }
 
-        fetch("http://localhost:9000/mensajitos", requestOptions)
+        fetch(`http://localhost:8080/mensajitos/`+ user, requestOptions)
             .then(response => response.json())
             .then(result => setDatatable({ columns: columns, rows: result }))
             .catch(error => console.log('error', error))
@@ -69,27 +69,25 @@ function Messages ()  {
 
 
     let enviarDatos = async () => {
-        let myHeaders = new Headers()
-        myHeaders.append("Content-Type", "application/json")
-
-        console.log(datosMensaje)
         
-        var a = JSON.stringify({
-            "mensaje": datosMensaje
-        });
+        const sendMessage = await methodPOST(enviarMensaje,{ "user":datosMensaje.Usuario, "message":datosMensaje.Mensaje})
 
-        
-        let requesOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: a,
-            redirect: 'follow'
+
+        if(sendMessage){
+            swal({
+                title:"Enviado",
+                text: "Mensaje enviado correctamente",
+                icon: "success",
+                timer: 1000,
+            });
+        }else{
+            swal({
+                title:"Error",
+                text: "No se envio el mensaje, intente de nuevo",
+                icon: "Error",
+                timer: 1000,
+            });
         }
-
-        fetch("http://localhost:9000/crear_mensaje", requesOptions)
-            .then(response => response.text())
-            .then(result =>console.log(result))
-            .catch(error => console.log('error', error))
         
     };
 
@@ -100,10 +98,9 @@ function Messages ()  {
     const mandar = () => {
         console.log('entro')
         socket.emit("probando", 'mensaje desde el cliente')
-
     }
-
 */
+
 
 
 
