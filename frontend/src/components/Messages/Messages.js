@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MDBDataTableV5 } from 'mdbreact'
 //import io from "socket.io-client";
 import swal from 'sweetalert';
 import { Grid, Text, Row, Input, Button } from "@nextui-org/react";
+//import { Form, Col } from 'react-bootstrap'
 
 import Barra from "../Barra/Barra"
 import {methodPOST,enviarMensaje} from "../../services/api";
@@ -10,7 +11,7 @@ import {methodPOST,enviarMensaje} from "../../services/api";
 
 
 /*
-const ENDPOINT = "http://localhost:9000/";
+const ENDPOINT = "http://localhost:8080/";
 const socket = io(ENDPOINT, {transports:['websocket']});
 */
 
@@ -21,10 +22,12 @@ function Messages ()  {
     
     const user = JSON.parse(localStorage.getItem('usuario'));
 
+    //let [cliente, setCliente] = useState([]) //Para USUARIO
 
 
+
+    //---------------- TABLA DE MENSAJES ---------------------------
     let [datatable, setDatatable] = useState({})
-
 
     useEffect(() => {
         const columns = [
@@ -51,11 +54,23 @@ function Messages ()  {
             redirect: 'follow'
         }
 
-        fetch(`http://localhost:8080/mensajitos/`+ user, requestOptions)
+        fetch(`http://localhost:8080/mensajitos/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => setDatatable({ columns: columns, rows: result }))
             .catch(error => console.log('error', error))
 
+            /*
+        fetch(`http://localhost:8080/getFriends/`+ user.attributes['custom:susname'], requestOptions)
+        .then(response => response.json())
+        .then(result => {
+            let arreglorespuesta = []
+            result.forEach((element) => {
+                arreglorespuesta.push(element.username)
+            })
+            setCliente(arreglorespuesta)
+        })
+        .catch(error => console.log('error', error))
+            */
     }, [])
 
 
@@ -66,7 +81,7 @@ function Messages ()  {
         Mensaje: "" 
     });
 
-
+    //let usuario = useRef()
 
     let enviarDatos = async () => {
         
@@ -89,7 +104,16 @@ function Messages ()  {
             });
         }
         
+        //socket.emit("probando", 'mensaje desde el cliente')
+        
     };
+
+
+
+
+
+
+
 
 
 
@@ -99,6 +123,26 @@ function Messages ()  {
         console.log('entro')
         socket.emit("probando", 'mensaje desde el cliente')
     }
+
+    
+        <Row>
+                <Col>
+                    <Form.Label  >
+                        Usuario
+                    </Form.Label>
+                </Col>
+                <Col>
+                    <Form.Group controlId="formGridState">
+                        <Form.Select defaultValue="Choose..." ref={usuario} >
+                            {
+                                cliente.map((option, index) => {
+                                    return (<option key={index} value={option}>{option}</option>)
+                                })
+                            }
+                        </Form.Select>
+                    </Form.Group>
+                </Col>
+        </Row>
 */
 
 

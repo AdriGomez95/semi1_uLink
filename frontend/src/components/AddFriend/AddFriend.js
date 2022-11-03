@@ -48,7 +48,7 @@ const AddFriend = () => {
         }
 
 
-        fetch(`http://localhost:8080/users/`+ user, requestOptions)
+        fetch(`http://localhost:8080/users/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => {
                 let filas = result.map((e) => {

@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const cors = require('cors'); //............. NUEVO
 app.use(cors());  //............. NUEVO
 
+//settings
+app.set('port', process.env.PORT || 8080)
 
 //------------------------------------------------------------------------------------ NUEVO
 app.use(bodyParser.json());
@@ -30,7 +32,7 @@ const io = require("socket.io")(pd,
 
 
 io.on("connection", (socket) => {
-  console.log('entro desde el front')
+  //console.log('entro desde el front')
   
   socket.on("probando", (data)=>{
     console.log("estamos conectados")
@@ -43,8 +45,6 @@ io.on("connection", (socket) => {
 
 
 
-//settings
-app.set('port', process.env.PORT || 8080)
 
 //middlewares
 app.use(morgan('dev'));
@@ -53,7 +53,7 @@ app.use(express.json())
 
 //Database Connection
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://ec2-35-174-172-210.compute-1.amazonaws.com/?tls=false";
+var url = "mongodb://ec2-18-215-159-161.compute-1.amazonaws.com/";
 
 //routes
 app.get('/', (req, res)=>{
@@ -62,6 +62,7 @@ app.get('/', (req, res)=>{
 
 app.post('/signup', (req, res)=>{
     const { name, lastname, username, email, password, imgurl} = req.body;
+    console.log('esto: ', req.body);
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("uLink");
@@ -228,8 +229,8 @@ app.post('/createPost', (req, res)=>{
     });
 })
 
-app.get('/readPosts', (req, res)=>{
-  const {username} = req.body;
+app.get('/readPosts/:usuario', (req, res)=>{
+  const username = req.params.usuario;
 
   var friends = []
 
@@ -272,4 +273,26 @@ app.get('/requests/:usuario', (req, res)=>{
     });
   });
 })
+
+
+app.get('/getFriends/:usuario', (req, res)=>{
+  const username = req.params.usuario;
+  
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("uLink");
+      var query = { username: username};
+      dbo.collection("users").find(query).toArray(function(err, result) {
+        if (err) throw err;
+        db.close();
+        if(result.length == 1){
+          res.json(result[0].friends)
+        }else{
+          res.json({"success": false})
+        }
+      });
+    });
+})
+
+
 

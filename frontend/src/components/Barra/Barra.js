@@ -9,7 +9,7 @@ export default function Barra() {
   };
 
   const AmigosPublicaciones = () => {
-    window.location="/publicaciones"
+    window.location="/publicaciones_amigos"
   };
 
 

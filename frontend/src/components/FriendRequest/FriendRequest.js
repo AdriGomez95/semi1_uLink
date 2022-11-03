@@ -54,7 +54,7 @@ const FriendRequest = () => {
             redirect: 'follow'
         }
 
-        fetch(`http://localhost:8080/requests/`+ username, requestOptions)
+        fetch(`http://localhost:8080/requests/`+ username.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => {
                 let filas = result.map((e) => {
@@ -90,6 +90,7 @@ const FriendRequest = () => {
                                 </Button>
                             }
                         }
+                        
                     } else {
                         return false
                     }
