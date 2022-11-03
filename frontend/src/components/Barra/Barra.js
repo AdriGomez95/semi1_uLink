@@ -5,11 +5,11 @@ import { Layout } from "./Layout.js";
 export default function Barra() {
 
   const MisPublicaciones = () => {
-    window.location="http://localhost:3000/publicaciones"
+    window.location="/publicaciones"
   };
 
   const AmigosPublicaciones = () => {
-    window.location="http://localhost:3000/publicaciones"
+    window.location="/publicaciones"
   };
 
 

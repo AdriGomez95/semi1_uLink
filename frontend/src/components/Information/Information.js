@@ -8,6 +8,7 @@ import {methodPOST,infoUsuario,updateInfoUser,methodPUT} from "../../services/ap
 import AWS from 'aws-sdk';
 import Barra from "../Barra/Barra";
 import foto from './fotoPerfil.jpg'
+import ChatBot from '../modals/modalChatBot';
 
 
 AWS.config.apiVersions = {
@@ -37,7 +38,7 @@ var params = {
 function Information ()  {
     const [username, setusername] =useState("")
     const user = JSON.parse(localStorage.getItem('usuario'));
-
+    const [modalChatBot, setModalChatBot] = useState(false);
     //console.log(user.attributes['custom:susname'])
 
     let usuarioName = user.attributes['custom:nombre']
@@ -295,8 +296,19 @@ function Information ()  {
             </Grid>
         </Grid.Container>
 
-
+       
         <br></br><br></br><br></br><br></br>
+        <Button color="primary" onPress={() => setModalChatBot(true)} style={{}}>
+                        ChatBot
+        </Button>
+  
+        
+        <ChatBot
+            modalIsOpen={modalChatBot}
+            closeModal={()=>{setModalChatBot(false)
+                console.log("cerrar")
+            } }
+        />
       </div>
     );
   };
