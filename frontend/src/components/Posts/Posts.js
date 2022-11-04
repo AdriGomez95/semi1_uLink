@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Text, Card, Grid,Button } from "@nextui-org/react";
 import Barra from '../Barra/Barra';
 import AWS from 'aws-sdk';
@@ -14,7 +14,7 @@ AWS.config.apiVersions = {
   })
  
 
-
+/*
   const arra =[
     {
         "usuario": "Fernando",
@@ -41,16 +41,22 @@ AWS.config.apiVersions = {
         "tags":[{ "tag": "seminario" }, { "tag": "seminario2" }, { "tag": "seminario3" }]
     },
   ]
- 
+ */
 
 function Posts () {
 
     const [PublicacionesFiltradas, setPublicacionesFiltradas] = useState([])
-    const [constador, setContador] = useState(0)
   
+    const username = JSON.parse(localStorage.getItem('usuario'));
     
-    
-    useEffect(() => {
+
+
+    const { values, handleInputChange } = useState({
+        NombreBusqueda: ''
+    });
+        
+
+    const publicaciones =()=>{
         let formdata2 = new FormData()
         let requestOptions2 = {
             method: 'GET',
@@ -58,43 +64,39 @@ function Posts () {
             redirect: 'follow'
         }
       
-        // fetch("http://localhost:9000/publicaciones", requestOptions2)
-        //     .then(response => response.json())
-        //     .then(result => setPublicacionesFiltradas(result))
-        //     .catch(error => console.log('error', error))
-    }, [])
-    const publicaciones =()=>{
-        setPublicacionesFiltradas(arra)
+        fetch(`http://localhost:8080/readPosts/` + username.attributes['custom:susname'], requestOptions2)
+             .then(response => response.json())
+             .then(result => setPublicacionesFiltradas(result))
+             .catch(error => console.log('error', error))
     }
 
     
     const traducir = () => {
         let arratemp = PublicacionesFiltradas
-        // setPublicacionesFiltradas([]) 
         for (let i = 0; i < arratemp.length; i++) {
             var params = {
                 SourceLanguageCode: 'auto',
                 TargetLanguageCode: 'en',
-                Text: arratemp[i].texto
+                Text: arratemp[i].contents
             };
             translate.translateText(params, function (err, data) {
                 if (err) console.log(err, err.stack); 
-                else  arratemp[i].texto = data['TranslatedText'];
+                else  arratemp[i].contents = data['TranslatedText'];
             });    
             
         }
         setPublicacionesFiltradas([])
-        //    setPublicacionesFiltradas(arratemp
     }
 
 
     let FiltrarNombre = (e) => {
         e.preventDefault()
 
-        if (PublicacionesFiltradas.usuario !== '') {
+
+        if (values.NombreBusqueda !== '') {
             console.log("aca")
-           
-            let arregloFiltrado = PublicacionesFiltradas.filter(item => item.modelo === PublicacionesFiltradas.usuario);
+            
+            let arregloFiltrado = PublicacionesFiltradas.filter(item => item.contents === values.contents);
             setPublicacionesFiltradas(arregloFiltrado)
         }
     }
@@ -117,10 +119,11 @@ function Posts () {
                 </Text>
 
 
+                <input name="NombreBusqueda"  type="text" value={values.NombreBusqueda} onChange={handleInputChange} placeholder="Nombre"  onBlur={FiltrarNombre} />       
+                    
 
-                <div class= "cards">        
-                    <input name="Nombre"  type="text" placeholder="Nombre" value={PublicacionesFiltradas.usuario} onBlur={FiltrarNombre} />       
-                    <Button color="primary" onPress={() => publicaciones()} style={{}}>
+                <div class= "cards"> 
+                <Button color="primary" onPress={() => publicaciones()} style={{}}>
                         Ver Publicaciones
                     </Button>      
                     <Button color="primary" onPress={() => traducir()} style={{}}>
@@ -130,7 +133,7 @@ function Posts () {
 
                 <Grid.Container gap={4} >
                     {
-                    PublicacionesFiltradas?.map((item, index) => ( 
+                    PublicacionesFiltradas.map((item, index) => ( 
                         <Grid xs={12} sm={4} key={index}>
                             <Card css={{ p: "$6", mw: "330px" }}>
                                 <Card.Header>
@@ -143,7 +146,7 @@ function Posts () {
                                     <Grid.Container css={{ pl: "$6" }}>
                                         <Grid xs={12}>
                                             <Text h4 css={{ lineHeight: "$xs" }}>
-                                            {item.usuario}
+                                            {item.author}
                                             </Text>
                                         </Grid>
                                     </Grid.Container>
@@ -151,19 +154,9 @@ function Posts () {
 
                                 <Card.Body css={{ py: "$2" }}>
                                     <Text>
-                                    {item.texto}
+                                    {item.contents}
                                     </Text>
                                 </Card.Body>
-                                <Card.Footer>
-                               {item.tags.map((item2, index) => (
-
-                                    <Text key={index} css={{ color: "$gray600" }}>
-                                         {item2.tag} {', '}
-                                    </Text> 
-                               
-                                ))}
-
-                                </Card.Footer>
                             </Card>  
                         </Grid>  
                     ))

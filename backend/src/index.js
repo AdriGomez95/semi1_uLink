@@ -247,7 +247,7 @@ app.get('/readPosts/:usuario', (req, res)=>{
         if (err) throw err;
         var dbo = db.db("uLink");
         console.log(friends);
-        dbo.collection("posts").find({author: {$in: friends}},{author:username}).sort({date:-1}).toArray(function(err, result) {
+        dbo.collection("posts").find({$or: [{author: {$in: friends}},{author:username}]}).sort({date:-1}).toArray(function(err, result) {
           if (err) throw err;
           console.log(result);
           db.close();
