@@ -3,12 +3,10 @@ import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
 import Modal from 'react-modal';
 const customStyles = {
     content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-148%, -25%)',
+      top: 'auto',
+      left: 'auto',
+      right: '0',
+      bottom: '0%',
     },
   };
 export default function ChatBot({modalIsOpen,closeModal}) {

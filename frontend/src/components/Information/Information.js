@@ -5,10 +5,10 @@ import swal from 'sweetalert';
 import { Auth } from "aws-amplify";
 import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
 import {methodPOST,infoUsuario,updateInfoUser,methodPUT} from "../../services/api";
-import AWS from 'aws-sdk';
 import Barra from "../Barra/Barra";
 import foto from './fotoPerfil.jpg'
 import ChatBot from '../modals/modalChatBot';
+import AWS from 'aws-sdk';
 
 
 AWS.config.apiVersions = {
@@ -45,7 +45,7 @@ function Information ()  {
     let usuarioUser = user.attributes['custom:susname']
     let usuarioEmail = user.attributes['email']
  
-    
+
  
     const [datosNuevos, setDatosNuevos] = useState({
         name: "",      
