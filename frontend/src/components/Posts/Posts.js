@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Text, Card, Grid,Button } from "@nextui-org/react";
+import React from 'react'
+import Select from 'react-select'
 import Barra from '../Barra/Barra';
 import AWS from 'aws-sdk';
 AWS.config.apiVersions = {
@@ -42,6 +44,23 @@ AWS.config.apiVersions = {
     },
   ]
  */
+  const options = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'es-MX', label: 'Mexican Spanish ' },
+    { value: 'fr', label: 'French' },
+    { value: 'sq', label: 'Albanian' },
+    { value: 'ca', label: 'Catalan' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'uk', label: 'Ukrainian' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'th', label: 'Thai' },
+    { value: 'tr', label: 'Turkish' },
+    { value: 'vi', label: 'Vietnamese' },
+    { value: 'de', label: 'German' },
+  ]
 
 function Posts () {
 
@@ -55,28 +74,17 @@ function Posts () {
         NombreBusqueda: ''
     });
         
+    const [contador,setContador]=useState(0)
+    let traducido=[]
 
-    const publicaciones =()=>{
-        let formdata2 = new FormData()
-        let requestOptions2 = {
-            method: 'GET',
-            data: formdata2,
-            redirect: 'follow'
-        }
-      
-        fetch(`http://localhost:8080/readPosts/` + username.attributes['custom:susname'], requestOptions2)
-             .then(response => response.json())
-             .then(result => setPublicacionesFiltradas(result))
-             .catch(error => console.log('error', error))
-    }
+   
 
-    
-    const traducir = () => {
+    const traducir = (e) => {
         let arratemp = PublicacionesFiltradas
         for (let i = 0; i < arratemp.length; i++) {
             var params = {
                 SourceLanguageCode: 'auto',
-                TargetLanguageCode: 'en',
+                TargetLanguageCode: e.value,
                 Text: arratemp[i].contents
             };
             translate.translateText(params, function (err, data) {
@@ -85,9 +93,31 @@ function Posts () {
             });    
             
         }
+        traducido=arratemp
         setPublicacionesFiltradas([])
+        hola()
     }
+    const hola= ()=>{
+        setPublicacionesFiltradas(traducido)
 
+    }
+    const siu=()=>{
+    setContador(contador+1)
+        }
+
+  
+    const publicaciones =()=>{
+        let formdata2 = new FormData()
+        let requestOptions2 = {
+            method: 'GET',
+            data: formdata2,
+            redirect: 'follow'
+        }
+        fetch(`https://cw7ed1p5b3.execute-api.us-east-1.amazonaws.com/prod/readPosts/` + username.attributes['custom:susname'], requestOptions2)
+        .then(response => response.json())
+        .then(result => setPublicacionesFiltradas(result))
+        .catch(error => console.log('error', error))
+    }
 
     let FiltrarNombre = (e) => {
         e.preventDefault()
@@ -126,7 +156,10 @@ function Posts () {
                 <Button color="primary" onPress={() => publicaciones()} style={{}}>
                         Ver Publicaciones
                     </Button>      
-                    <Button color="primary" onPress={() => traducir()} style={{}}>
+                    <Select options={options} 
+                    onChange={traducir}
+                    />
+                    <Button color="primary" onPress={() => siu()} style={{}}>
                         Translate
                     </Button>    
                 </div>
@@ -139,9 +172,9 @@ function Posts () {
                                 <Card.Header>
                                     <img
                                     alt="nextui logo"
-                                    src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                                    width="34px"
-                                    height="34px"
+                                    src={item.base64img}
+                                    width="100px"
+                                    height="100px"
                                     />
                                     <Grid.Container css={{ pl: "$6" }}>
                                         <Grid xs={12}>
@@ -156,6 +189,7 @@ function Posts () {
                                     <Text>
                                     {item.contents}
                                     </Text>
+                                    
                                 </Card.Body>
                             </Card>  
                         </Grid>  

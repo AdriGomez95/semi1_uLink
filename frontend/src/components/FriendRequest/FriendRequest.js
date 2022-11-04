@@ -49,7 +49,7 @@ const FriendRequest = () => {
             redirect: 'follow'
         }
 
-        fetch(`http://localhost:8080/requests/`+ username.attributes['custom:susname'], requestOptions)
+        fetch(`https://cw7ed1p5b3.execute-api.us-east-1.amazonaws.com/prod/requests/`+ username.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => {
                 let filas = result.map((e) => {

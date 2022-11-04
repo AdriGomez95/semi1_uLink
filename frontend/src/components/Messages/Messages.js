@@ -59,13 +59,13 @@ function Messages ()  {
             redirect: 'follow'
         }
 
-        fetch(`http://localhost:8080/readMessages/`+ user.attributes['custom:susname'], requestOptions)
+        fetch(`https://cw7ed1p5b3.execute-api.us-east-1.amazonaws.com/prod/readMessages/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => setDatatable({ columns: columns, rows: result }))
             .catch(error => console.log('error', error))
 
             
-        fetch(`http://localhost:8080/getFriends/`+ user.attributes['custom:susname'], requestOptions)
+        fetch(`https://cw7ed1p5b3.execute-api.us-east-1.amazonaws.com/prod/getFriends/`+ user.attributes['custom:susname'], requestOptions)
         .then(response => response.json())
         .then(result => setCliente(result))
         .catch(error => console.log('error', error))
@@ -75,10 +75,6 @@ function Messages ()  {
 
 
     //---------------- DATOS A ENVIAR ---------------------------
-    const [datosMensaje, setDatosMensaje] = useState({    
-        Mensaje: "" 
-    });
-
     let usuario = useRef()
     let escrito = useRef()
 
@@ -87,7 +83,7 @@ function Messages ()  {
         let nuevoU = usuario.current.value
         let nuevoE = escrito.current.value
 
-        //console.log("author: ", user.attributes['custom:susname'], " receiver: ",nuevoU, " contents: ",nuevoE)
+        console.log("author: ", user.attributes['custom:susname'], " receiver: ",nuevoU, " contents: ",nuevoE)
         const sendMessage = await methodPOST(enviarMensaje,{"author": user.attributes['custom:susname'], "receiver":nuevoU, "contents":nuevoE})
 
 
@@ -107,7 +103,6 @@ function Messages ()  {
             });
         }
         
-        //socket.emit("probando", 'mensaje desde el cliente')
         
     };
 

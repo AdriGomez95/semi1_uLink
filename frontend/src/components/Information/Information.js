@@ -298,11 +298,16 @@ function Information ()  {
 
        
         <br></br><br></br><br></br><br></br>
-        <Button color="primary" onPress={() => setModalChatBot(true)} style={{}}>
-                        ChatBot
-        </Button>
+       
   
+        {
+            datosNuevos.bot ==='true' &&(
+                <Button color="primary" onPress={() => setModalChatBot(true)} style={{}}>
+                ChatBot
+            </Button>
         
+            )
+        }
         <ChatBot
             modalIsOpen={modalChatBot}
             closeModal={()=>{setModalChatBot(false)

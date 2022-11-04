@@ -40,6 +40,7 @@ export default function Barra() {
           <Navbar.Link href="/solicitudes">Solicitudes</Navbar.Link>
           <Navbar.Link isActive href="/informacion">Informacion</Navbar.Link>
           <Navbar.Link href="/mensajes">Chat</Navbar.Link>
+          <Navbar.Link href="/">Log Out</Navbar.Link>
 
 
 

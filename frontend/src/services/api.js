@@ -1,4 +1,4 @@
-const URL = "http://localhost:8080";
+const URL = "https://cw7ed1p5b3.execute-api.us-east-1.amazonaws.com/prod";
 
 
 export const login = "login";
@@ -18,7 +18,7 @@ export const crearPost = "createPost";
 export const methodPOST = (peticion, data) => {
   return fetch(`${URL}/${peticion}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json","Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true  },
+    headers: { "Content-Type": "application/json"},
     body: JSON.stringify(data),
   })
     .then((response) => {
@@ -62,7 +62,7 @@ export const methodGET = (peticion, data) => {
 export const methodPUT = (peticion, data) => {
   return fetch(`${URL}/${peticion}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json","Access-Control-Allow-Origin" : "*", "Access-Control-Allow-Credentials" : true  },
+    headers: { "Content-Type": "application/json"},
     body: JSON.stringify(data),
   })
     .then((response) => {
