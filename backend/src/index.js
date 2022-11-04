@@ -212,14 +212,15 @@ app.put('/answer', (req, res)=>{
 
 
 app.post('/createPost', (req, res)=>{
-  const {author, contents, date, tags} = req.body;
+  const {author, contents, base64img} = req.body;
   
   MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       var dbo = db.db("uLink");
       var today = new Date()
       var now = today.toLocaleDateString()
-      var myobj = { author:author, contents:contents, date:today, tags:tags};
+      var tags= {}
+      var myobj = { author:author, contents:contents, base64img:base64img, tags:tags, date:today};
       dbo.collection("posts").insertOne(myobj, function(err, result) {
         if (err) throw err;
         console.log(myobj)
@@ -295,5 +296,52 @@ app.get('/getFriends/:usuario', (req, res)=>{
     });
 })
 
+app.post('/sendMessage', (req, res)=>{
+  //const username = req.params.usuario;
+  const {author, receiver, contents} = req.body;
+  
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("uLink");
+      var today = new Date()
+      var now = today.toLocaleDateString()
+      var myobj = { author:author, receiver: receiver, contents:contents, date:today};
+      dbo.collection("messages").insertOne(myobj, function(err, result) {
+        if (err) throw err;
+        console.log(myobj)
+        console.log("Message Sended");
+        db.close();
+        res.json({"success": true})
+      });
+    });
+})
+
+app.get('/readMessages/:usuario', (req, res)=>{
+  const username = req.params.usuario;
+
+  var friends = []
+
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("uLink");
+    dbo.collection("users").findOne({username:username}, function(err, result) {
+      if (err) throw err;
+      friends = result.friends;
+      db.close();
+      MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("uLink");
+        console.log(friends);
+        dbo.collection("messages").find({receiver:username}).sort({date:-1}).toArray(function(err, result) {
+          if (err) throw err;
+          console.log(result);
+          db.close();
+          res.json(result)
+        });
+      });
+    });
+  });
+
+})
 
 

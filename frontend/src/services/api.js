@@ -10,8 +10,10 @@ export const eliminarArchivo="deletefile";
 export const infoUsuario="userinfo";
 export const enviarSolicitud = "request";
 export const aceptarSolicitud = "answer";
-export const enviarMensaje = "sendmessages";
+export const enviarMensaje = "sendMessage";
 export const updateInfoUser = "update";
+export const crearPost = "createPost";
+
 
 export const methodPOST = (peticion, data) => {
   return fetch(`${URL}/${peticion}`, {

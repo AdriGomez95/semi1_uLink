@@ -31,11 +31,6 @@ const FriendRequest = () => {
                 width: 200,
             },
             {
-                label: 'Modo boot',
-                field: 'bot',
-                width: 200,
-            },
-            {
                 label: 'Aceptar solicitud',
                 field: 'aceptar',
                 width: 200,

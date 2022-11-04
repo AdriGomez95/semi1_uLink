@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { MDBDataTableV5 } from 'mdbreact'
 //import io from "socket.io-client";
 import swal from 'sweetalert';
 import { Grid, Text, Row, Input, Button } from "@nextui-org/react";
-//import { Form, Col } from 'react-bootstrap'
+import { Form, Col } from 'react-bootstrap'
 
 import Barra from "../Barra/Barra"
 import {methodPOST,enviarMensaje} from "../../services/api";
@@ -22,7 +22,7 @@ function Messages ()  {
     
     const user = JSON.parse(localStorage.getItem('usuario'));
 
-    //let [cliente, setCliente] = useState([]) //Para USUARIO
+    let [cliente, setCliente] = useState([]) //Para USUARIO
 
 
 
@@ -33,7 +33,7 @@ function Messages ()  {
         const columns = [
             {
                 label: 'Usuario',
-                field: 'username',
+                field: 'author',
                 width: 150,
                 attributes: {
                     'aria-controls': 'DataTable',
@@ -42,7 +42,12 @@ function Messages ()  {
             },
             {
                 label: 'Mensaje',
-                field: 'message',
+                field: 'contents',
+                width: 200,
+            },
+            {
+                label: 'Fecha',
+                field: 'date',
                 width: 200,
             }
         ]
@@ -54,38 +59,36 @@ function Messages ()  {
             redirect: 'follow'
         }
 
-        fetch(`http://localhost:8080/mensajitos/`+ user.attributes['custom:susname'], requestOptions)
+        fetch(`http://localhost:8080/readMessages/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => setDatatable({ columns: columns, rows: result }))
             .catch(error => console.log('error', error))
 
-            /*
+            
         fetch(`http://localhost:8080/getFriends/`+ user.attributes['custom:susname'], requestOptions)
         .then(response => response.json())
-        .then(result => {
-            let arreglorespuesta = []
-            result.forEach((element) => {
-                arreglorespuesta.push(element.username)
-            })
-            setCliente(arreglorespuesta)
-        })
+        .then(result => setCliente(result))
         .catch(error => console.log('error', error))
-            */
+            
     }, [])
 
 
 
     //---------------- DATOS A ENVIAR ---------------------------
-    const [datosMensaje, setDatosMensaje] = useState({   
-        Usuario: "",  
+    const [datosMensaje, setDatosMensaje] = useState({    
         Mensaje: "" 
     });
 
-    //let usuario = useRef()
+    let usuario = useRef()
+    let escrito = useRef()
 
     let enviarDatos = async () => {
         
-        const sendMessage = await methodPOST(enviarMensaje,{ "user":datosMensaje.Usuario, "message":datosMensaje.Mensaje})
+        let nuevoU = usuario.current.value
+        let nuevoE = escrito.current.value
+
+        //console.log("author: ", user.attributes['custom:susname'], " receiver: ",nuevoU, " contents: ",nuevoE)
+        const sendMessage = await methodPOST(enviarMensaje,{"author": user.attributes['custom:susname'], "receiver":nuevoU, "contents":nuevoE})
 
 
         if(sendMessage){
@@ -124,25 +127,6 @@ function Messages ()  {
         socket.emit("probando", 'mensaje desde el cliente')
     }
 
-    
-        <Row>
-                <Col>
-                    <Form.Label  >
-                        Usuario
-                    </Form.Label>
-                </Col>
-                <Col>
-                    <Form.Group controlId="formGridState">
-                        <Form.Select defaultValue="Choose..." ref={usuario} >
-                            {
-                                cliente.map((option, index) => {
-                                    return (<option key={index} value={option}>{option}</option>)
-                                })
-                            }
-                        </Form.Select>
-                    </Form.Group>
-                </Col>
-        </Row>
 */
 
 
@@ -166,25 +150,36 @@ function Messages ()  {
         <Grid.Container gap={3} justify="center">
             <Grid>
                 <Row>
-                    <Input
-                        bordered
-                        labelPlaceholder="Usuario" color="primary"
-                        id="Usuario" name="Usuario"
-                        onChange={(e) => {datosMensaje.Usuario=e.target.value}}
-                    />
+                    <Col>
+                        <Form.Label  >
+                            Usuario
+                        </Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Group controlId="formGridState">
+                            <Form.Select defaultValue="Choose..." ref={usuario} >
+                                {
+                                    cliente.map((option, index) => {
+                                        return (<option key={index} value={option}>{option}</option>)
+                                    })
+                                }
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
                 </Row>
             </Grid>
 
 
             <Grid>
                 <Row>
-                    <Input
-                        bordered
-                        labelPlaceholder="Mensaje" color="primary"
-                        id="Mensaje" name="Mensaje"
-                        onChange={(e) => {datosMensaje.Mensaje=e.target.value}}
-                    
-                    />
+                    <Col>
+                        <Form.Label column lg={2}>
+                            Mensaje
+                        </Form.Label>  
+                    </Col>
+                    <Col>                 
+                        <Form.Control type="text" placeholder="Escriba su mensaje" ref={escrito}  />
+                    </Col>
                 </Row>
             </Grid>
 
