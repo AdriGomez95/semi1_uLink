@@ -4,18 +4,19 @@ import { Button } from 'react-bootstrap'
 import swal from 'sweetalert'
 
 import Barra from "../Barra/Barra"
-
+import {methodPOST,enviarSolicitud} from "../../services/api";
 
 const AddFriend = () => {
     let [datatable, setDatatable] = useState({})
 
-
+    const user = JSON.parse(localStorage.getItem('usuario'));
+    //console.log('Mi usuario:',user.attributes['custom:susname'])
 
     useEffect(() => {
         const columns = [
             {
                 label: 'Nombre',
-                field: 'nombre',
+                field: 'name',
                 width: 150,
                 attributes: {
                     'aria-controls': 'DataTable',
@@ -24,12 +25,12 @@ const AddFriend = () => {
             },
             {
                 label: 'Usuario',
-                field: 'usuario',
+                field: 'username',
                 width: 200,
             },
             {
                 label: 'Modo boot',
-                field: 'boot',
+                field: 'bot',
                 width: 200,
             },
             {
@@ -46,13 +47,14 @@ const AddFriend = () => {
             redirect: 'follow'
         }
 
-        fetch("http://localhost:9000/listado_usuarios", requestOptions)
+
+        fetch(`http://localhost:8080/users/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => {
                 let filas = result.map((e) => {
                     if (e.estado !== '') {
                         return {
-                            ...e, enviar: <Button variant="warning" onClick={() => { solicitud(e) }}>
+                            ...e, enviar: <Button variant="success" onClick={() => { solicitud(e) }}>
                                 Enviar
                             </Button>
                         }
@@ -69,43 +71,26 @@ const AddFriend = () => {
     }, [])
 
 
-    const solicitud = (datatable) => {
-        let myHeaders = new Headers()
-        myHeaders.append("Content-Type", "application/json")
+    const solicitud = async (datatable) => {
 
-        let a = JSON.stringify(datatable)
+        const enviaSolicitud = await methodPOST(enviarSolicitud,{ "user":user.attributes['custom:susname'], "friend":datatable.username})
 
-        let requesOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: a,
-            redirect: 'follow'
+
+        if(enviaSolicitud){
+            swal({
+                title:"Enviado",
+                text: "Se ha enviado la solicitud",
+                icon: "success",
+                timer: 1000,
+            });
+        }else{
+            swal({
+                title:"Error",
+                text: "No se envio la solicitud",
+                icon: "Error",
+                timer: 1000,
+            });
         }
-
-        fetch("http://localhost:9000/enviar_solicitud", requesOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result)
-
-                swal({
-                    title:"Enviado",
-                    text: "Se ha enviado la solicitud",
-                    icon: "success",
-                    timer: 1000,
-                });
-                /*
-                if (result.status === 200) {
-                    swal({
-                        title:"Enviado",
-                        text: "Se ha enviado la solicitud",
-                        icon: "success",
-                        timer: 1000,
-                    });
-                }*/
-            })
-            .catch(error => console.log('error', error))
-
-
     }
 
 

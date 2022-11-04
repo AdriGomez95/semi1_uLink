@@ -1,9 +1,51 @@
 const express = require('express');
 const app = express();
-const morgan = require('morgan');
+var bodyParser = require('body-parser');  //............. NUEVO
+const morgan = require('morgan'); 
+const cors = require('cors'); //............. NUEVO
+app.use(cors());  //............. NUEVO
 
 //settings
 app.set('port', process.env.PORT || 8080)
+
+//------------------------------------------------------------------------------------ NUEVO
+app.use(bodyParser.json());
+
+app.use(cors({ origin: true, optionsSuccessStatus: 200 }));
+app.use(bodyParser.json({ limit: "50mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+//------------------------------------------------------------------------------------ FIN
+
+
+
+//starting server
+const pd = app.listen(app.get('port'), ()=>{
+  console.debug(`Server on port ${app.get('port')}`)
+})
+
+
+//------------------------------------------------------------------------------------ NUEVO
+const io = require("socket.io")(pd, 
+  {  
+      cors: {    origin: "http://localhost:3000",  }
+  });
+
+
+io.on("connection", (socket) => {
+  //console.log('entro desde el front')
+  
+  socket.on("probando", (data)=>{
+    console.log("estamos conectados")
+    console.log(data)
+  });
+      
+});
+//------------------------------------------------------------------------------------ FIN
+
+
+
+
+
 
 //middlewares
 app.use(morgan('dev'));
@@ -12,7 +54,7 @@ app.use(express.json())
 
 //Database Connection
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://ec2-35-174-172-210.compute-1.amazonaws.com/?tls=false";
+var url = "mongodb://ec2-18-215-159-161.compute-1.amazonaws.com/";
 
 //routes
 app.get('/', (req, res)=>{
@@ -21,7 +63,7 @@ app.get('/', (req, res)=>{
 
 app.post('/signup', (req, res)=>{
     const { name, lastname, username, email, password, imgurl} = req.body;
-    
+    console.log('esto: ', req.body);
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("uLink");
@@ -45,7 +87,6 @@ app.post('/login', (req, res)=>{
         var query = { username: username, password:password };
         dbo.collection("users").find(query).toArray(function(err, result) {
           if (err) throw err;
-          console.log(result);
           db.close();
           if(result.length == 1){
             res.json(result[0])
@@ -57,7 +98,7 @@ app.post('/login', (req, res)=>{
 })
 
 
-app.get('/userinfo', (req, res)=>{
+app.post('/userinfo', (req, res)=>{
   const {username} = req.body;
   
   MongoClient.connect(url, function(err, db) {
@@ -80,7 +121,7 @@ app.get('/userinfo', (req, res)=>{
 
 app.put('/update', (req, res)=>{
   const {name, lastname, username, imgurl, bot, actualusername} = req.body;
-  
+
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db("uLink");
@@ -94,9 +135,9 @@ app.put('/update', (req, res)=>{
     });
   });
 })
-
-app.get('/users', (req, res)=>{
-  const {username} = req.body;
+ 
+app.get('/users/:usuario', (req, res)=>{
+  const username = req.params.usuario;
   
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
@@ -104,7 +145,7 @@ app.get('/users', (req, res)=>{
     dbo.collection("users").find({friends: {$nin: [username]}}).toArray(function(err, result) {
       if (err) throw err;
       console.log(result);
-      db.close();
+      db.close(); 
       res.json(result)
     });
   });
@@ -171,14 +212,15 @@ app.put('/answer', (req, res)=>{
 
 
 app.post('/createPost', (req, res)=>{
-  const {author, contents, date, tags} = req.body;
+  const {author, contents, base64img} = req.body;
   
   MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       var dbo = db.db("uLink");
       var today = new Date()
       var now = today.toLocaleDateString()
-      var myobj = { author:author, contents:contents, date:today, tags:tags};
+      var tags= {}
+      var myobj = { author:author, contents:contents, base64img:base64img, tags:tags, date:today};
       dbo.collection("posts").insertOne(myobj, function(err, result) {
         if (err) throw err;
         console.log(myobj)
@@ -189,8 +231,8 @@ app.post('/createPost', (req, res)=>{
     });
 })
 
-app.get('/readPosts', (req, res)=>{
-  const {username} = req.body;
+app.get('/readPosts/:usuario', (req, res)=>{
+  const username = req.params.usuario;
 
   var friends = []
 
@@ -205,7 +247,7 @@ app.get('/readPosts', (req, res)=>{
         if (err) throw err;
         var dbo = db.db("uLink");
         console.log(friends);
-        dbo.collection("posts").find({author: {$in: friends}},{author:username}).sort({date:-1}).toArray(function(err, result) {
+        dbo.collection("posts").find({$or: [{author: {$in: friends}},{author:username}]}).sort({date:-1}).toArray(function(err, result) {
           if (err) throw err;
           console.log(result);
           db.close();
@@ -218,7 +260,88 @@ app.get('/readPosts', (req, res)=>{
 })
 
 
-//starting server
-app.listen(app.get('port'), ()=>{
-    console.log(`Server on port ${app.get('port')}`)
+app.get('/requests/:usuario', (req, res)=>{
+  const username = req.params.usuario; 
+  
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("uLink");
+    var query = { friend: username};
+    dbo.collection("requests").find(query).toArray(function(err, result) {
+      if (err) throw err;
+      //console.log(result);
+      db.close();  
+      res.json(result)
+    });
+  });
 })
+
+
+app.get('/getFriends/:usuario', (req, res)=>{
+  const username = req.params.usuario;
+  
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("uLink");
+      var query = { username: username};
+      dbo.collection("users").find(query).toArray(function(err, result) {
+        if (err) throw err;
+        db.close();
+        if(result.length == 1){
+          res.json(result[0].friends)
+        }else{
+          res.json({"success": false})
+        }
+      });
+    });
+})
+
+app.post('/sendMessage', (req, res)=>{
+  //const username = req.params.usuario;
+  const {author, receiver, contents} = req.body;
+  
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("uLink");
+      var today = new Date()
+      var now = today.toLocaleDateString()
+      var myobj = { author:author, receiver: receiver, contents:contents, date:today};
+      dbo.collection("messages").insertOne(myobj, function(err, result) {
+        if (err) throw err;
+        console.log(myobj)
+        console.log("Message Sended");
+        db.close();
+        res.json({"success": true})
+      });
+    });
+})
+
+app.get('/readMessages/:usuario', (req, res)=>{
+  const username = req.params.usuario;
+
+  var friends = []
+
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("uLink");
+    dbo.collection("users").findOne({username:username}, function(err, result) {
+      if (err) throw err;
+      friends = result.friends;
+      db.close();
+      MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("uLink");
+        console.log(friends);
+        dbo.collection("messages").find({receiver:username}).sort({date:-1}).toArray(function(err, result) {
+          if (err) throw err;
+          console.log(result);
+          db.close();
+          res.json(result)
+        });
+      });
+    });
+  });
+
+})
+
+

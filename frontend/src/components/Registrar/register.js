@@ -1,20 +1,23 @@
 import "./estilo.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import swal from "sweetalert";
-import Amplify from "aws-amplify";
+
 import { Auth } from "aws-amplify";
 import { methodPOST, registrar } from "../../services/api";
+import AWS from 'aws-sdk'
+AWS.config.update({
+  accessKeyId: 'AKIAS73YTZZYZGXS56UN',
+  secretAccessKey: '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',
+})
+
+const S3_BUCKET ='archivos-grupo5-p1/seminario';
 
 
-Amplify.configure({
-  aws_project_region: 'us-east-1',
+const myBucket = new AWS.S3({
+  params: { Bucket: S3_BUCKET},
   region: 'us-east-1',
-  identityPoolRegion: 'us-east-1',
-  userPoolId: 'us-east-1_HjfRMnfJq',
-  userPoolWebClientId: '5p35dsn9vvefr9k8r4fc0qhr09',
-});
-
+})
 
 function Registrar() {
   let navigate = useNavigate();
@@ -24,9 +27,13 @@ function Registrar() {
     email: "",
     name: "",
     confirmPassword: "",
+    imgurl:""
   });
+
+
+  
   const log = async () => {
-    // console.log(registrarte);
+    console.log(registrarte);
     if (
       registrarte.username != "" &&
       registrarte.password != "" &&
@@ -35,15 +42,17 @@ function Registrar() {
     ) {
       try {
         if (registrarte.password === registrarte.confirmPassword) {
-        await Auth.signUp({
-          username: registrarte.email,
-          password: registrarte.password,
-          attributes: {
-            email:registrar.email,
-            'custom:nombre': registrarte.name,
-            'custom:susname': registrarte.username,
-          },
-        });
+          const register=  await Auth.signUp({
+            username: registrarte.email,
+            password: registrarte.password,
+            attributes: {
+              email:registrarte.email,
+              'custom:nombre': registrarte.name,
+              'custom:susname': registrarte.username,
+            },
+          });
+
+        await methodPOST(registrar,{ "name":registrarte.name, "lastname":"", "username":registrarte.username, "email":registrarte.email, "password":registrarte.password, "imgurl": registrarte.imgurl})
         swal("Exito","Registrado Con exito!", "success");
         navigate("/");
       }else{
@@ -57,6 +66,33 @@ function Registrar() {
       swal("Incomplete data", "Please fill in all the fields!", "error");
     }
   };
+
+  const [progress , setProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const handleFileInput = (e) => {
+      uploadFile(e.target.files[0])
+  }
+  
+  const uploadFile = (file) => {
+    console.log(registrarte.imgurl)
+    const params = {
+      ACL: 'public-read',
+      Body: file,
+      Bucket: S3_BUCKET,
+      Key: file.name
+    };
+    
+      registrarte.imgurl=`https://archivos-grupo5-p1.s3.us-east-2.amazonaws.com/seminario/${file.name}`
+
+    myBucket.putObject(params)
+        .on('httpUploadProgress', (evt) => {
+            setProgress(Math.round((evt.loaded / evt.total) * 100))
+        })
+        .send((err) => {
+            if (err) console.log(err)
+        })
+}
+
   return (
     <div className="Auth-form-container" style={{ background: "gray" }}>
       <div className="Auth-form">
@@ -114,6 +150,17 @@ function Registrar() {
                 registrarte.confirmPassword = e.target.value;
               }}
             />
+          </div>
+          <div className="form-group mt-3">
+            <label>Subir imagen</label>
+            <input
+                    class="form-control"
+                    type="file"
+                    accept="image/*"
+                    name="avatar-file"
+                    onChange={handleFileInput}
+                  />
+            {/* <img src={registrarte.imgurl} height={'100%'} width={'100%'}/> */}
           </div>
           <div className="d-grid gap-2 mt-3"></div>
         </div>

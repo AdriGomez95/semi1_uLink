@@ -1,31 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { MDBDataTableV5 } from 'mdbreact'
-import io from "socket.io-client";
+//import io from "socket.io-client";
 import swal from 'sweetalert';
-import { Grid, Card, Text, Row, Col, Input, Button } from "@nextui-org/react";
+import { Grid, Text, Row, Input, Button } from "@nextui-org/react";
+import { Form, Col } from 'react-bootstrap'
 
 import Barra from "../Barra/Barra"
+import {methodPOST,enviarMensaje} from "../../services/api";
 
 
 
-
-const ENDPOINT = "http://localhost:9000/";
+/*
+const ENDPOINT = "http://localhost:8080/";
 const socket = io(ENDPOINT, {transports:['websocket']});
-
+*/
 
 
 
 
 function Messages ()  {
     
-    let [datatable, setDatatable] = useState({})
+    const user = JSON.parse(localStorage.getItem('usuario'));
 
+    let [cliente, setCliente] = useState([]) //Para USUARIO
+
+
+
+    //---------------- TABLA DE MENSAJES ---------------------------
+    let [datatable, setDatatable] = useState({})
 
     useEffect(() => {
         const columns = [
             {
                 label: 'Usuario',
-                field: 'usuario',
+                field: 'author',
                 width: 150,
                 attributes: {
                     'aria-controls': 'DataTable',
@@ -34,12 +42,12 @@ function Messages ()  {
             },
             {
                 label: 'Mensaje',
-                field: 'mensaje',
+                field: 'contents',
                 width: 200,
             },
             {
                 label: 'Fecha',
-                field: 'fecha',
+                field: 'date',
                 width: 200,
             }
         ]
@@ -51,45 +59,55 @@ function Messages ()  {
             redirect: 'follow'
         }
 
-        fetch("http://localhost:9000/mensajitos", requestOptions)
+        fetch(`http://localhost:8080/readMessages/`+ user.attributes['custom:susname'], requestOptions)
             .then(response => response.json())
             .then(result => setDatatable({ columns: columns, rows: result }))
             .catch(error => console.log('error', error))
 
+            
+        fetch(`http://localhost:8080/getFriends/`+ user.attributes['custom:susname'], requestOptions)
+        .then(response => response.json())
+        .then(result => setCliente(result))
+        .catch(error => console.log('error', error))
+            
     }, [])
 
 
 
     //---------------- DATOS A ENVIAR ---------------------------
-    const [datosMensaje, setDatosMensaje] = useState({   
-        Usuario: "",  
+    const [datosMensaje, setDatosMensaje] = useState({    
         Mensaje: "" 
     });
 
-
+    let usuario = useRef()
+    let escrito = useRef()
 
     let enviarDatos = async () => {
-        let myHeaders = new Headers()
-        myHeaders.append("Content-Type", "application/json")
-
-        console.log(datosMensaje)
         
-        var a = JSON.stringify({
-            "mensaje": datosMensaje
-        });
+        let nuevoU = usuario.current.value
+        let nuevoE = escrito.current.value
 
-        
-        let requesOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: a,
-            redirect: 'follow'
+        //console.log("author: ", user.attributes['custom:susname'], " receiver: ",nuevoU, " contents: ",nuevoE)
+        const sendMessage = await methodPOST(enviarMensaje,{"author": user.attributes['custom:susname'], "receiver":nuevoU, "contents":nuevoE})
+
+
+        if(sendMessage){
+            swal({
+                title:"Enviado",
+                text: "Mensaje enviado correctamente",
+                icon: "success",
+                timer: 1000,
+            });
+        }else{
+            swal({
+                title:"Error",
+                text: "No se envio el mensaje, intente de nuevo",
+                icon: "Error",
+                timer: 1000,
+            });
         }
-
-        fetch("http://localhost:9000/crear_mensaje", requesOptions)
-            .then(response => response.text())
-            .then(result =>console.log(result))
-            .catch(error => console.log('error', error))
+        
+        //socket.emit("probando", 'mensaje desde el cliente')
         
     };
 
@@ -97,16 +115,19 @@ function Messages ()  {
 
 
 
-    //let socket = io('/localhost:9000/connection')
-    
-    //const ENDPOINT = "http://localhost:9000/connection";
-    //const socket = io(ENDPOINT, {transports:['websocket']});
+
+
+
+
+
+
+/*
     const mandar = () => {
         console.log('entro')
         socket.emit("probando", 'mensaje desde el cliente')
-
     }
 
+*/
 
 
 
@@ -129,32 +150,43 @@ function Messages ()  {
         <Grid.Container gap={3} justify="center">
             <Grid>
                 <Row>
-                    <Input
-                        bordered
-                        labelPlaceholder="Usuario" color="primary"
-                        id="Usuario" name="Usuario"
-                        onChange={(e) => {datosMensaje.Usuario=e.target.value}}
-                    />
+                    <Col>
+                        <Form.Label  >
+                            Usuario
+                        </Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Group controlId="formGridState">
+                            <Form.Select defaultValue="Choose..." ref={usuario} >
+                                {
+                                    cliente.map((option, index) => {
+                                        return (<option key={index} value={option}>{option}</option>)
+                                    })
+                                }
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
                 </Row>
             </Grid>
 
 
             <Grid>
                 <Row>
-                    <Input
-                        bordered
-                        labelPlaceholder="Mensaje" color="primary"
-                        id="Mensaje" name="Mensaje"
-                        onChange={(e) => {datosMensaje.Mensaje=e.target.value}}
-                    
-                    />
+                    <Col>
+                        <Form.Label column lg={2}>
+                            Mensaje
+                        </Form.Label>  
+                    </Col>
+                    <Col>                 
+                        <Form.Control type="text" placeholder="Escriba su mensaje" ref={escrito}  />
+                    </Col>
                 </Row>
             </Grid>
 
 
             <Grid>
                 <Row>
-                    <Button auto ghost color="gradient" onPress={() => mandar()} >
+                    <Button auto ghost color="gradient" onPress={() => enviarDatos()} >
                         Enviar mensaje
                     </Button>
                 </Row>            

@@ -5,11 +5,11 @@ import { Layout } from "./Layout.js";
 export default function Barra() {
 
   const MisPublicaciones = () => {
-    window.location="http://localhost:3000/publicaciones"
+    window.location="/hacer_publicacion"
   };
 
   const AmigosPublicaciones = () => {
-    window.location="http://localhost:3000/publicaciones"
+    window.location="/publicaciones"
   };
 
 
@@ -39,7 +39,7 @@ export default function Barra() {
           <Navbar.Link href="/agregar_amigos">Amigos</Navbar.Link>
           <Navbar.Link href="/solicitudes">Solicitudes</Navbar.Link>
           <Navbar.Link isActive href="/informacion">Informacion</Navbar.Link>
-          <Navbar.Link href="/">Chat</Navbar.Link>
+          <Navbar.Link href="/mensajes">Chat</Navbar.Link>
 
 
 
